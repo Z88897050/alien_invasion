@@ -6,7 +6,7 @@ from bullet import Bullet
 from alien import Alien
 
 
-def update_bullets(bullets):
+def update_bullets(ai_settings, screen, ship, aliens, bullets):
     """更新子弹的位置，并删除已消失的子弹"""
     # 更新子弹的位置
     bullets.update()
@@ -14,6 +14,21 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+
+
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+    """响应子弹和外星人的碰撞"""
+    # 删除发生碰撞的子弹和外星人
+    # 检查是否有子弹击中了外星人
+    # 如果是这样，就删除相应的子弹和外星人(下面两个True)
+    # 如果模拟一个子弹能消灭它击中的每个外星人，可将第一个设为False,
+    # 这样被击中的外星人消失，但子弹始终有效，直到抵达屏幕顶端后消失
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if len(aliens) == 0:
+        # 删除现有的子弹并新建一群外星人
+        bullets.empty()
+        create_fleet(ai_settings, screen, ship, aliens)
 
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
